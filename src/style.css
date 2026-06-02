@@ -110,7 +110,8 @@ a { color: inherit; text-decoration: none; }
 .step-num { font-family: "Space Grotesk", sans-serif; font-size: 3rem; font-weight: 300; color: var(--blue); display: block; margin-bottom: 0.8rem; }
 
 /* Pricing */
-.pricing .price-card { padding: 2.6rem; }
+.pricing-solo { max-width: 640px; margin-top: 2.6rem; }
+.pricing .price-card, .pricing-solo .price-card { padding: 2.6rem; }
 .price-card.featured { border-color: var(--blue); }
 .tag { font-family: "Space Grotesk", sans-serif; font-weight: 600; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue); margin-bottom: 1rem; }
 .tag.cyan { color: var(--cyan); }

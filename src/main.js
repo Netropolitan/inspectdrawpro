@@ -187,21 +187,23 @@ function buildWorkflow(s) {
   const hi = new THREE.Mesh(new THREE.PlaneGeometry(4, 3), new THREE.MeshBasicMaterial({ color: BLUE, transparent: true, opacity: 0 })); hi.position.set(room[0], room[1], -0.02); plan.add(hi);
   const search = new THREE.Mesh(new THREE.RingGeometry(0.9, 1.05, 40), new THREE.MeshBasicMaterial({ color: CYAN, transparent: true, opacity: 0, side: THREE.DoubleSide })); search.position.set(room[0], room[1], 0.1); plan.add(search);
   const mk = marker(BLUE); mk.position.set(room[0], room[1], 0); plan.add(mk);
-  // inspection panel (slides in, faces camera)
-  const panel = new THREE.Group(); world.add(panel);
-  const pBg = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 5), new THREE.MeshBasicMaterial({ color: 0x12161f, transparent: true, opacity: 0.9 }));
-  const pEdge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(4.2, 5)), lineMat(0x33405a, 0.9));
-  panel.add(pBg); panel.add(pEdge);
-  const status = new THREE.Mesh(new THREE.CircleGeometry(0.28, 24), new THREE.MeshBasicMaterial({ color: 0x5a6068 })); status.position.set(-1.3, 1.7, 0.02); panel.add(status);
-  const photo = new THREE.Mesh(new THREE.PlaneGeometry(3, 1.6), new THREE.MeshBasicMaterial({ color: 0x1a2230 })); photo.position.set(0, -0.4, 0.02); panel.add(photo);
-  panel.rotation.x = 0.5; panel.position.set(8, 0.5, 2);
-  // report (flips up at the end)
-  const report = new THREE.Group(); world.add(report);
-  const rBg = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 4.6), new THREE.MeshBasicMaterial({ color: 0x0c1018, transparent: true, opacity: 0.95 }));
-  const rEdge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(3.4, 4.6)), lineMat(BLUE, 0.8));
-  report.add(rBg); report.add(rEdge);
-  for (let i = 0; i < 6; i++) { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute([-1.3, 1.6 - i*0.6, 0.01, 1.3 - (i%2)*0.8, 1.6 - i*0.6, 0.01], 3)); report.add(new THREE.Line(g, lineMat(0x9aa1ac, 0.5))); }
-  report.position.set(4.5, 0.5, 1.5); report.scale.setScalar(0);
+  // Floating UI in screen-facing space (children of the scene, not the tilted plan):
+  // inspection panel to the RIGHT, exported document to the LEFT, both held in front
+  // of the blueprint so neither cuts through it.
+  const uiMat = (color, op) => new THREE.MeshBasicMaterial({ color, transparent: true, opacity: op });
+  const uiPanel = (w, h, fill, edge, op) => {
+    const g = new THREE.Group();
+    const bg = new THREE.Mesh(new THREE.PlaneGeometry(w, h), uiMat(fill, op));
+    const ed = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(w, h)), lineMat(edge, 0.9));
+    g.add(bg); g.add(ed); g.userData = { bg, ed }; return g;
+  };
+  const panel = uiPanel(3.5, 4.6, 0x12161f, 0x33405a, 0.92); s.scene.add(panel);
+  const status = new THREE.Mesh(new THREE.CircleGeometry(0.26, 24), uiMat(0x5a6068, 1)); status.position.set(-1.05, 1.5, 0.03); panel.add(status);
+  const photo = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.5), uiMat(0x1a2230, 1)); photo.position.set(0, -0.4, 0.03); panel.add(photo);
+  panel.position.set(10, 2, 6); panel.rotation.y = -0.18;
+  const report = uiPanel(3.2, 4.4, 0x0c1018, BLUE, 0.96); s.scene.add(report);
+  for (let i = 0; i < 6; i++) { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute([-1.15, 1.5 - i*0.55, 0.03, 1.15 - (i%2)*0.7, 1.5 - i*0.55, 0.03], 3)); report.add(new THREE.Line(g, lineMat(0x9aa1ac, 0.5))); }
+  report.position.set(-5.4, 2, 6); report.rotation.y = 0.18; report.scale.setScalar(0);
   const steps = [...document.querySelectorAll('#story-steps li')];
   const CY = 9; // seconds per full loop
   let lastPhase = -1;
@@ -217,13 +219,17 @@ function buildWorkflow(s) {
     // phase 1 marker
     const md = phase < 1 ? 0 : (phase === 1 ? 1 - Math.pow(1 - local, 3) : 1);
     mk.position.z = (1 - md) * 5; mk.userData.m.material.opacity = md; mk.userData.ring.scale.setScalar(md * (1 + Math.sin(t * 3) * 0.15)); mk.userData.ring.material.opacity = 0.5 * md;
-    // phase 2 panel + status + photo
-    const pd = phase < 2 ? 0 : (phase === 2 ? 1 - Math.pow(1 - local, 3) : 1);
-    panel.position.x = 8 - pd * 4.5; panel.children.forEach((ch) => { if (ch.material) ch.material.opacity = (ch === pBg ? 0.9 : ch === pEdge ? 0.9 : 1) * pd; ch.material && (ch.material.transparent = true); });
+    // phase 2 inspection panel slides in from the right; fades out as export begins
+    let pd = 0, pfade = 1;
+    if (phase === 2) pd = 1 - Math.pow(1 - local, 3); else if (phase === 3) { pd = 1; pfade = 1 - local; }
+    const pOp = pd * pfade;
+    panel.visible = phase >= 2; panel.position.x = 10 - pd * 5.2;
+    panel.userData.bg.material.opacity = 0.92 * pOp; panel.userData.ed.material.opacity = 0.9 * pOp;
+    status.material.opacity = pOp; photo.material.opacity = pOp;
     status.material.color.setHex(phase >= 2 && local > 0.5 ? 0x116dff : 0x5a6068);
-    // phase 3 report
+    // phase 3 exported document rises on the LEFT of the blueprint
     const rd = phase < 3 ? 0 : 1 - Math.pow(1 - local, 3);
-    report.scale.setScalar(rd); report.rotation.x = (1 - rd) * 1.2;
+    report.visible = phase >= 3; report.scale.setScalar(rd); report.position.x = -5.4 - (1 - rd) * 2; report.rotation.x = (1 - rd) * 1.0;
   };
 }
 
