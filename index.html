@@ -5,22 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InspectDraw Pro — From floor plan to final report</title>
   <meta name="description" content="A portable inspection workflow built around your technical drawings. Search the plan, mark findings, capture evidence, and ship a signed PDF report from site." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="theme-color" content="#0A0B0D" />
   <meta property="og:title" content="InspectDraw Pro" />
   <meta property="og:description" content="From floor plan to final report. Search the plan, mark findings, capture evidence, export a signed PDF." />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://inspectdrawpro.com/" />
+  <meta property="og:image" content="https://inspectdrawpro.com/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://inspectdrawpro.com/og.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/src/style.css" />
 </head>
 <body>
-  <!-- Nav -->
   <header class="nav" id="nav">
     <a class="logo" href="#top"><span>Inspect Draw</span> <b>Pro</b></a>
     <nav class="nav-links">
       <a href="#problem">Overview</a>
       <a href="#features">Features</a>
       <a href="#workflow">Workflow</a>
+      <a href="#deployment">Deployment</a>
       <a href="#pricing">Pricing</a>
     </nav>
     <a class="btn btn-primary nav-cta" href="#contact">Request a demo</a>
@@ -29,7 +37,7 @@
   <main id="top">
     <!-- 01 Hero -->
     <section class="hero">
-      <canvas id="hero-canvas" aria-hidden="true"></canvas>
+      <canvas class="scene" data-scene="hero" id="scene-hero" aria-hidden="true"></canvas>
       <div class="hero-fallback" aria-hidden="true"></div>
       <div class="hero-inner">
         <p class="label">Field inspection workflow</p>
@@ -45,29 +53,50 @@
     <!-- 02 Problem -->
     <section class="section" id="problem">
       <p class="label">The problem</p>
-      <h2>Field inspections still run on paper, photos, and email chains.</h2>
-      <p class="section-body">Engineers print the drawing, scribble on it, take phone photos, and rebuild the report back at the desk. Findings get lost, photos detach from their location, and reports take days.</p>
+      <h2>Replace the field-tool pile.</h2>
+      <p class="section-body">Printed drawings, scribbled notes, a camera roll full of photos, and a report rebuilt back at the desk. Findings get lost, photos detach from their location, and reports take days. InspectDraw Pro replaces the whole pile with one direct workflow.</p>
     </section>
 
-    <!-- 03 Solution -->
-    <section class="section" id="solution">
-      <p class="label">The solution</p>
-      <h2>One app. Your drawing. A finished report.</h2>
-      <p class="section-body">InspectDraw Pro turns any technical PDF into a live inspection canvas. Search the plan, drop labelled markers, attach status, notes and photos, and export a signed report.</p>
-    </section>
-
-    <!-- 04 Workflow -->
-    <section class="section" id="workflow">
-      <p class="label">How it works</p>
-      <h2>Three steps, on-site.</h2>
-      <div class="grid grid-3 steps">
-        <article class="card step"><span class="step-num">01</span><h3>Find the location</h3><p>Type a label, room number or circuit ID. Hits jump straight to the spot on the plan.</p></article>
-        <article class="card step"><span class="step-num">02</span><h3>Mark &amp; capture</h3><p>Drop a premade marker or draw a shape. Set status, add notes, attach up to five photos.</p></article>
-        <article class="card step"><span class="step-num">03</span><h3>Sign off &amp; deliver</h3><p>Sign on screen and hit Export. A clean PDF lists every finding, its status and its photos.</p></article>
+    <!-- 03 Solution (3D) -->
+    <section class="section split" id="solution">
+      <div class="split-text">
+        <p class="label">The solution</p>
+        <h2>One app. Your drawing. A finished report.</h2>
+        <p class="section-body">InspectDraw Pro turns any technical PDF into a live inspection canvas. Search the plan, drop labelled markers, attach status, notes and photos, and export a signed report.</p>
+      </div>
+      <div class="split-visual">
+        <canvas class="scene" data-scene="solution" id="scene-solution" aria-hidden="true"></canvas>
       </div>
     </section>
 
-    <!-- 05 Features -->
+    <!-- 04 Why it fits -->
+    <section class="section" id="why">
+      <p class="label">Why it fits</p>
+      <h2>Built for real sites, not boardrooms.</h2>
+      <div class="grid grid-4">
+        <article class="card mini"><h3>Offline-first</h3><p>Built for patchy site conditions. The workflow keeps moving where cloud-first tools stall.</p></article>
+        <article class="card mini"><h3>Tablet-ready</h3><p>Designed around large technical drawings and touch, on a single rugged tablet.</p></article>
+        <article class="card mini"><h3>Drawing-linked</h3><p>Every finding stays pinned to the exact location it came from on the plan.</p></article>
+        <article class="card mini"><h3>Report-ready</h3><p>Closes the gap between finding an issue and issuing a usable record.</p></article>
+      </div>
+    </section>
+
+    <!-- 05 Workflow (3D storyboard) -->
+    <section class="section" id="workflow">
+      <p class="label">How it works</p>
+      <h2>Find the location. Mark the issue. Capture the evidence.</h2>
+      <div class="storyboard">
+        <canvas class="scene" data-scene="workflow" id="scene-workflow" aria-hidden="true"></canvas>
+        <ol class="story-steps" id="story-steps">
+          <li data-step="0"><span>01</span>Search</li>
+          <li data-step="1"><span>02</span>Mark</li>
+          <li data-step="2"><span>03</span>Inspect</li>
+          <li data-step="3"><span>04</span>Export</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 06 Features -->
     <section class="section" id="features">
       <p class="label">Core features</p>
       <h2>Built for the way engineers actually work.</h2>
@@ -84,7 +113,7 @@
       </div>
     </section>
 
-    <!-- 06 Built for -->
+    <!-- 07 Built for -->
     <section class="section" id="built-for">
       <p class="label">Built for</p>
       <h2>Field teams who live on technical drawings.</h2>
@@ -96,7 +125,23 @@
       </div>
     </section>
 
-    <!-- 07 Pricing -->
+    <!-- 08 Deployment (3D) -->
+    <section class="section split reverse" id="deployment">
+      <div class="split-visual">
+        <canvas class="scene" data-scene="deployment" id="scene-deployment" aria-hidden="true"></canvas>
+      </div>
+      <div class="split-text">
+        <p class="label">Deployment</p>
+        <h2>Portable inspections for real sites.</h2>
+        <div class="packages">
+          <article class="pkg"><p class="tag">School Estate Package</p><h3>Multi-building walkarounds</h3><p>Record faults against the plan and keep a reliable site record without depending on stable Wi-Fi across older buildings. Shared tablets, searchable plan prep, refresher training.</p></article>
+          <article class="pkg"><p class="tag">Hospital Compliance</p><h3>Location-based evidence trails</h3><p>Tie findings to exact service areas and plant rooms, structured for ongoing compliance. One to two shared tablets, drawing-update support, offline-ready.</p></article>
+          <article class="pkg"><p class="tag">Contractor Site Kit</p><h3>Inspection &amp; repair logging</h3><p>Arrive with the drawings loaded, log checks and defects, export before leaving site. Fast onboarding, software plus device plus support. Strong paid-pilot fit.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 Pricing -->
     <section class="section" id="pricing">
       <p class="label">Out-of-the-box pricing</p>
       <h2>Own it outright. One estate, one licence.</h2>
@@ -128,7 +173,7 @@
       <p class="section-body small">Need more than the box? Tailored services (drawing &amp; digitisation, on-site setup, consulting, data migration, custom build and training) are scoped and priced per engagement.</p>
     </section>
 
-    <!-- 08 Origin -->
+    <!-- 10 Origin -->
     <section class="section" id="origin">
       <p class="label">The origin</p>
       <h2>Not a marketing-led product.</h2>
@@ -147,7 +192,7 @@
       </div>
     </section>
 
-    <!-- 09 Contact -->
+    <!-- 11 Contact -->
     <section class="section contact" id="contact">
       <p class="rule" aria-hidden="true"></p>
       <h2 class="center">See it on your drawings.</h2>
