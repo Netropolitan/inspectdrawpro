@@ -147,6 +147,67 @@ function buildHero(s) {
   };
 }
 
+function buildProblem(s) {
+  s.camera.fov = 40; s.camera.position.set(0, 0, 12);
+  const grp = new THREE.Group(); grp.rotation.set(-0.12, 0.3, 0); s.scene.add(grp);
+  grp.add(depthGrid(34, 1.7, -7));
+  // loose drawing sheets with greyed-out text lines
+  const sheet = (w, h, op) => {
+    const g = new THREE.Group();
+    const pg = []; const ln = (a, b, c, d) => pg.push(a, b, 0, c, d, 0);
+    ln(-w/2,-h/2,w/2,-h/2); ln(w/2,-h/2,w/2,h/2); ln(w/2,h/2,-w/2,h/2); ln(-w/2,h/2,-w/2,-h/2);
+    const gg = new THREE.BufferGeometry(); gg.setAttribute('position', new THREE.Float32BufferAttribute(pg, 3));
+    g.add(new THREE.LineSegments(gg, lineMat(BLUE, op)));
+    const tl = [];
+    const rows = Math.floor(h / 0.75) - 1;
+    for (let i = 0; i < rows; i++) {
+      const y = h/2 - 0.65 - i * 0.7; const wl = (w - 1) * (0.5 + ((i * 7) % 4) * 0.13);
+      tl.push(-w/2 + 0.45, y, 0, -w/2 + 0.45 + wl, y, 0);
+    }
+    const tg = new THREE.BufferGeometry(); tg.setAttribute('position', new THREE.Float32BufferAttribute(tl, 3));
+    g.add(new THREE.LineSegments(tg, lineMat(0x9aa1ac, op * 0.45)));
+    return g;
+  };
+  const defs = [
+    [-3.4, 1.7, -1.5, 3.2, 4.2, 0.5, 0.22],
+    [0.4, 2.4, -2.5, 2.6, 3.4, 0.3, -0.3],
+    [3.3, 0.6, -1, 2.8, 3.8, 0.55, 0.1],
+    [-1.4, -1.7, 0.5, 3.6, 2.6, 0.35, -0.14],
+    [2.4, -2.5, -0.5, 2.3, 3.0, 0.4, 0.38],
+    [-4, -2.2, -2, 2.1, 2.8, 0.25, -0.46],
+  ];
+  const sheets = defs.map(([x, y, z, w, h, op, rz], i) => {
+    const g = sheet(w, h, op); g.position.set(x, y, z); g.rotation.z = rz;
+    grp.add(g); return { g, y, rz, ph: i * 1.1 };
+  });
+  // photos detached from their location
+  const photo = (x, y, z, rz) => {
+    const g = new THREE.Group();
+    const w = 1.5, h = 1.1;
+    const pg = []; const ln = (a, b, c, d) => pg.push(a, b, 0, c, d, 0);
+    ln(-w/2,-h/2,w/2,-h/2); ln(w/2,-h/2,w/2,h/2); ln(w/2,h/2,-w/2,h/2); ln(-w/2,h/2,-w/2,-h/2);
+    ln(-w/2+0.2,-h/2+0.25,-0.1,h/2-0.45); ln(-0.1,h/2-0.45,w/2-0.2,-h/2+0.25);
+    const gg = new THREE.BufferGeometry(); gg.setAttribute('position', new THREE.Float32BufferAttribute(pg, 3));
+    g.add(new THREE.LineSegments(gg, lineMat(CYAN, 0.5)));
+    g.position.set(x, y, z); g.rotation.z = rz; grp.add(g); return g;
+  };
+  const photos = [photo(1.4, -0.4, 1.2, -0.2), photo(-2.6, 3.2, 0.8, 0.35)];
+  // a finding with nowhere to live
+  const lost = marker(CYAN); lost.position.set(3.5, -1.6, 1.4); grp.add(lost);
+  return (t) => {
+    grp.rotation.y = 0.3 + Math.sin(t * 0.18) * 0.08 + ptr.x * 0.3;
+    grp.rotation.x = -0.12 + ptr.y * 0.12;
+    sheets.forEach((o) => {
+      o.g.position.y = o.y + Math.sin(t * 0.7 + o.ph) * 0.22;
+      o.g.rotation.z = o.rz + Math.sin(t * 0.5 + o.ph * 2) * 0.05;
+    });
+    photos.forEach((p, i) => { p.rotation.z += Math.sin(t * 0.4 + i * 2.4) * 0.0008; });
+    lost.position.y = -1.6 + Math.sin(t * 0.8) * 0.3;
+    const pu = 1 + Math.sin(t * 2.2) * 0.2;
+    lost.userData.ring.scale.setScalar(pu); lost.userData.m.material.opacity = 0.75 + Math.sin(t * 2.2) * 0.25;
+  };
+}
+
 function buildSolution(s) {
   s.camera.fov = 40; s.camera.position.set(0, 0, 11);
   const grp = new THREE.Group(); grp.rotation.set(-0.35, -0.5, 0); s.scene.add(grp);
@@ -259,7 +320,7 @@ function buildDeployment(s) {
 
 /* ---------- Mount ---------- */
 if (!reduced) {
-  const map = { hero: buildHero, solution: buildSolution, workflow: buildWorkflow, deployment: buildDeployment };
+  const map = { hero: buildHero, problem: buildProblem, solution: buildSolution, workflow: buildWorkflow, deployment: buildDeployment };
   document.querySelectorAll('canvas.scene').forEach((c) => {
     const b = map[c.dataset.scene];
     if (b) new Scene3D(c, b);
